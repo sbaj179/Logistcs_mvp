@@ -1,7 +1,9 @@
 import { SectionHeader } from "@/components/SectionHeader";
+import { getIntegrationHealth } from "@/lib/data";
 import styles from "@/styles/Page.module.css";
 
-export default function IngestionPage() {
+export default async function IngestionPage() {
+  const integrationHealth = await getIntegrationHealth();
   return (
     <div className={styles.page}>
       <SectionHeader
@@ -56,10 +58,11 @@ export default function IngestionPage() {
         <div className={styles.panel}>
           <div className={styles.panelHeader}>Integration Health</div>
           <div className={styles.list}>
-            <p>CSV ingestion: Healthy (last sync 14m ago)</p>
-            <p>Telematics: Degraded (2 of 5 vehicles stale)</p>
-            <p>Email docs: Healthy (last inbox check 4m ago)</p>
-            <p>Manual overrides: 3 pending reconciliation</p>
+            {integrationHealth.map((item) => (
+              <p key={item.id}>
+                {item.source}: {item.status} ({item.detail})
+              </p>
+            ))}
           </div>
         </div>
       </div>

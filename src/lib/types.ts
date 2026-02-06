@@ -67,6 +67,8 @@ export interface Case {
   type: CaseType;
   priority: "Low" | "Medium" | "High" | "Critical";
   status: CaseStatus;
+  openedAt?: string;
+  closedAt?: string;
   slaDue: string;
   owner: string;
   rootCause?: string;
@@ -102,4 +104,26 @@ export interface AuditLogEntry {
   action: string;
   entity: string;
   timestamp: string;
+}
+
+export interface IntegrationHealth {
+  id: string;
+  source: string;
+  status: string;
+  detail: string;
+}
+
+export interface RoleDefinition {
+  id: string;
+  role: TenantRole;
+  description: string;
+}
+
+export interface HandoverTemplate {
+  id: string;
+  shipmentId: string;
+  driver: string;
+  fuelLevel: string;
+  sealIntact: string;
+  notes: string;
 }

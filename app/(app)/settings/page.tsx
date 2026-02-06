@@ -1,7 +1,9 @@
 import { SectionHeader } from "@/components/SectionHeader";
+import { getAuditLog, getRoleDefinitions } from "@/lib/data";
 import styles from "@/styles/Page.module.css";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const [roleDefinitions, auditLog] = await Promise.all([getRoleDefinitions(), getAuditLog()]);
   return (
     <div className={styles.page}>
       <SectionHeader
@@ -14,18 +16,19 @@ export default function SettingsPage() {
         <div className={styles.panel}>
           <div className={styles.panelHeader}>Role Definitions</div>
           <div className={styles.list}>
-            <p>Admin: Full tenant configuration and user access.</p>
-            <p>Operations: Execution control, cases, and manual ingestion.</p>
-            <p>Compliance: Document vault, audit exports, closure approvals.</p>
-            <p>Read-only: Customer view of shipment timeline.</p>
+            {roleDefinitions.map((role) => (
+              <p key={role.id}>{role.role}: {role.description}</p>
+            ))}
           </div>
         </div>
         <div className={styles.panel}>
           <div className={styles.panelHeader}>Audit Log</div>
           <div className={styles.list}>
-            <p>Audit logs are immutable and exportable.</p>
-            <p>Every change captures actor, timestamp, and entity.</p>
-            <p>Manual overrides flagged for review.</p>
+            {auditLog.map((entry) => (
+              <p key={entry.id}>
+                {entry.actor} · {entry.action} · {new Date(entry.timestamp).toLocaleString()}
+              </p>
+            ))}
           </div>
         </div>
       </div>

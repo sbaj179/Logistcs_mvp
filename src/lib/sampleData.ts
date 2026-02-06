@@ -1,4 +1,14 @@
-import type { AuditLogEntry, Case, Document, Event, IdleSession, Shipment } from "@/lib/types";
+import type {
+  AuditLogEntry,
+  Case,
+  Document,
+  Event,
+  HandoverTemplate,
+  IdleSession,
+  IntegrationHealth,
+  RoleDefinition,
+  Shipment
+} from "@/lib/types";
 
 export const shipments: Shipment[] = [
   {
@@ -110,6 +120,7 @@ export const cases: Case[] = [
     type: "LateDelivery",
     priority: "High",
     status: "Investigating",
+    openedAt: "2024-11-05T13:42:00Z",
     slaDue: "2024-11-06T16:00:00Z",
     owner: "Riya Singh",
     rootCause: "Detour - highway closure"
@@ -120,6 +131,7 @@ export const cases: Case[] = [
     type: "IdleLoss",
     priority: "Medium",
     status: "Open",
+    openedAt: "2024-11-04T13:05:00Z",
     slaDue: "2024-11-05T15:00:00Z",
     owner: "Miguel Santos"
   }
@@ -186,5 +198,66 @@ export const auditLog: AuditLogEntry[] = [
     action: "Idle loss exception triggered",
     entity: "case_3302",
     timestamp: "2024-11-04T13:06:00Z"
+  }
+];
+
+export const integrationHealth: IntegrationHealth[] = [
+  {
+    id: "health_1",
+    source: "CSV ingestion",
+    status: "Healthy",
+    detail: "last sync 14m ago"
+  },
+  {
+    id: "health_2",
+    source: "Telematics",
+    status: "Degraded",
+    detail: "2 of 5 vehicles stale"
+  },
+  {
+    id: "health_3",
+    source: "Email docs",
+    status: "Healthy",
+    detail: "last inbox check 4m ago"
+  },
+  {
+    id: "health_4",
+    source: "Manual overrides",
+    status: "Attention",
+    detail: "3 pending reconciliation"
+  }
+];
+
+export const roleDefinitions: RoleDefinition[] = [
+  {
+    id: "role_admin",
+    role: "Admin",
+    description: "Full tenant configuration and user access."
+  },
+  {
+    id: "role_ops",
+    role: "Operations",
+    description: "Execution control, cases, and manual ingestion."
+  },
+  {
+    id: "role_compliance",
+    role: "Compliance",
+    description: "Document vault, audit exports, closure approvals."
+  },
+  {
+    id: "role_readonly",
+    role: "ReadOnly",
+    description: "Customer view of shipment timeline."
+  }
+];
+
+export const handoverTemplates: HandoverTemplate[] = [
+  {
+    id: "handover_1",
+    shipmentId: "ship_9012",
+    driver: "Alex Morgan",
+    fuelLevel: "70%",
+    sealIntact: "Yes",
+    notes: "Add structured notes"
   }
 ];

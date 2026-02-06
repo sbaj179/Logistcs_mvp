@@ -1,8 +1,9 @@
 import { SectionHeader } from "@/components/SectionHeader";
-import { documents } from "@/lib/sampleData";
+import { getDocuments } from "@/lib/data";
 import styles from "@/styles/Page.module.css";
 
-export default function DocumentsPage() {
+export default async function DocumentsPage() {
+  const documents = await getDocuments();
   return (
     <div className={styles.page}>
       <SectionHeader

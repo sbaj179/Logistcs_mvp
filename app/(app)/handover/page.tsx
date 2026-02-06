@@ -1,7 +1,10 @@
 import { SectionHeader } from "@/components/SectionHeader";
+import { getHandoverTemplates } from "@/lib/data";
 import styles from "@/styles/Page.module.css";
 
-export default function HandoverPage() {
+export default async function HandoverPage() {
+  const handoverTemplates = await getHandoverTemplates();
+  const template = handoverTemplates[0];
   return (
     <div className={styles.page}>
       <SectionHeader
@@ -16,26 +19,26 @@ export default function HandoverPage() {
           <div className={styles.formGrid}>
             <div className={styles.field}>
               <label>Shipment ID</label>
-              <input placeholder="ship_9012" />
+              <input placeholder={template?.shipmentId ?? "ship_9012"} />
             </div>
             <div className={styles.field}>
               <label>Driver</label>
-              <input placeholder="Alex Morgan" />
+              <input placeholder={template?.driver ?? "Alex Morgan"} />
             </div>
             <div className={styles.field}>
               <label>Fuel Level</label>
-              <input placeholder="70%" />
+              <input placeholder={template?.fuelLevel ?? "70%"} />
             </div>
             <div className={styles.field}>
               <label>Seal Intact</label>
               <select>
-                <option>Yes</option>
-                <option>No</option>
+                <option>{template?.sealIntact ?? "Yes"}</option>
+                <option>{template?.sealIntact === "Yes" ? "No" : "Yes"}</option>
               </select>
             </div>
             <div className={styles.field}>
               <label>Notes</label>
-              <textarea placeholder="Add structured notes" />
+              <textarea placeholder={template?.notes ?? "Add structured notes"} />
             </div>
           </div>
           <div className={styles.inlineActions}>

@@ -1,9 +1,10 @@
 import { SectionHeader } from "@/components/SectionHeader";
 import { DataTable } from "@/components/DataTable";
-import { cases } from "@/lib/sampleData";
+import { getCases } from "@/lib/data";
 import styles from "@/styles/Page.module.css";
 
-export default function CasesPage() {
+export default async function CasesPage() {
+  const cases = await getCases();
   const rows = cases.map((item) => ({
     id: item.id,
     shipment: item.shipmentId,
