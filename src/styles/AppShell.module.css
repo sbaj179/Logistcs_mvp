@@ -1,0 +1,10 @@
+.shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+.content {
+  background: #f5f6f8;
+}

@@ -1,0 +1,26 @@
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+}
+
+.value {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.helper {
+  font-size: 14px;
+  color: #0f172a;
+}
