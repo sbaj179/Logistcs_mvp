@@ -1,14 +1,20 @@
 import { notFound } from "next/navigation";
 import { SectionHeader } from "@/components/SectionHeader";
 import { Timeline } from "@/components/Timeline";
-import { cases, documents, events, shipments } from "@/lib/sampleData";
+import { getCases, getDocuments, getEvents, getShipments } from "@/lib/data";
 import styles from "@/styles/Page.module.css";
 
 interface ShipmentDetailPageProps {
   params: { id: string };
 }
 
-export default function ShipmentDetailPage({ params }: ShipmentDetailPageProps) {
+export default async function ShipmentDetailPage({ params }: ShipmentDetailPageProps) {
+  const [shipments, cases, documents, events] = await Promise.all([
+    getShipments(),
+    getCases(),
+    getDocuments(),
+    getEvents()
+  ]);
   const shipment = shipments.find((item) => item.id === params.id);
 
   if (!shipment) {

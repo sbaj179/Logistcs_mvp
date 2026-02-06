@@ -1,9 +1,11 @@
 import { SectionHeader } from "@/components/SectionHeader";
 import { DataTable } from "@/components/DataTable";
-import { idleSessions } from "@/lib/sampleData";
+import { getIdleSessions } from "@/lib/data";
+import { computeIdleTotals } from "@/lib/metrics";
 import styles from "@/styles/Page.module.css";
 
-export default function IdleLossPage() {
+export default async function IdleLossPage() {
+  const idleSessions = await getIdleSessions();
   const rows = idleSessions.map((session) => ({
     vehicle: session.vehicleId,
     duration: `${session.minutes} min`,
@@ -11,6 +13,8 @@ export default function IdleLossPage() {
     cost: `$${session.cost.toFixed(2)}`,
     window: `${new Date(session.start).toLocaleTimeString()} - ${new Date(session.end).toLocaleTimeString()}`
   }));
+  const todayTotals = computeIdleTotals(idleSessions, 1);
+  const weekTotals = computeIdleTotals(idleSessions, 7);
 
   return (
     <div className={styles.page}>
@@ -23,15 +27,15 @@ export default function IdleLossPage() {
       <div className={`${styles.grid} ${styles.gridThree}`}>
         <div className={styles.panel}>
           <div className={styles.panelHeader}>Today</div>
-          <p>Idle minutes: 88</p>
-          <p>Fuel wasted: 3.97 L</p>
-          <p>Cost impact: $5.56</p>
+          <p>Idle minutes: {todayTotals.minutes}</p>
+          <p>Fuel wasted: {todayTotals.litres.toFixed(2)} L</p>
+          <p>Cost impact: ${todayTotals.cost.toFixed(2)}</p>
         </div>
         <div className={styles.panel}>
           <div className={styles.panelHeader}>Weekly</div>
-          <p>Idle minutes: 426</p>
-          <p>Fuel wasted: 19.3 L</p>
-          <p>Cost impact: $27.40</p>
+          <p>Idle minutes: {weekTotals.minutes}</p>
+          <p>Fuel wasted: {weekTotals.litres.toFixed(2)} L</p>
+          <p>Cost impact: ${weekTotals.cost.toFixed(2)}</p>
         </div>
         <div className={styles.panel}>
           <div className={styles.panelHeader}>Exception Thresholds</div>

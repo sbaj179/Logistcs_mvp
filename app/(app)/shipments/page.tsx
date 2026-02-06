@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { SectionHeader } from "@/components/SectionHeader";
-import { shipments } from "@/lib/sampleData";
+import { getShipments } from "@/lib/data";
 import styles from "@/styles/Page.module.css";
 
-export default function ShipmentsPage() {
+export default async function ShipmentsPage() {
+  const shipments = await getShipments();
   return (
     <div className={styles.page}>
       <SectionHeader

@@ -1,10 +1,16 @@
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatCard } from "@/components/StatCard";
 import { DataTable } from "@/components/DataTable";
-import { cases, shipments } from "@/lib/sampleData";
+import { getCases, getShipments } from "@/lib/data";
+import {
+  computeActiveCasesCount,
+  computeOnTimeDeliveryRate,
+  computeOnTimePickupRate
+} from "@/lib/metrics";
 import styles from "@/styles/Page.module.css";
 
-export default function ControlCenterPage() {
+export default async function ControlCenterPage() {
+  const [cases, shipments] = await Promise.all([getCases(), getShipments()]);
   const caseRows = cases.map((item) => ({
     shipment: item.shipmentId,
     type: item.type,
@@ -12,6 +18,9 @@ export default function ControlCenterPage() {
     owner: item.owner,
     sla: new Date(item.slaDue).toLocaleString()
   }));
+  const onTimePickupRate = computeOnTimePickupRate(shipments, 7);
+  const onTimeDeliveryRate = computeOnTimeDeliveryRate(shipments, 7);
+  const activeCases = computeActiveCasesCount(cases);
 
   return (
     <div className={styles.page}>
@@ -22,9 +31,9 @@ export default function ControlCenterPage() {
       />
 
       <div className={`${styles.grid} ${styles.gridThree}`}>
-        <StatCard label="On-time Pickup" value="92%" helper="Rolling 7 days" />
-        <StatCard label="On-time Delivery" value="87%" helper="Rolling 7 days" />
-        <StatCard label="Active Exceptions" value="6" helper="3 require compliance review" />
+        <StatCard label="On-time Pickup" value={`${onTimePickupRate.toFixed(0)}%`} helper="Rolling 7 days" />
+        <StatCard label="On-time Delivery" value={`${onTimeDeliveryRate.toFixed(0)}%`} helper="Rolling 7 days" />
+        <StatCard label="Active Exceptions" value={`${activeCases}`} helper="Open or investigating" />
       </div>
 
       <div className={`${styles.grid} ${styles.gridTwo}`}>
