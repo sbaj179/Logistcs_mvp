@@ -1,26 +1,72 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatCard } from "@/components/StatCard";
 import { DataTable } from "@/components/DataTable";
-import { getCases, getShipments } from "@/lib/data";
+import { listCases, listShipments } from "@/lib/data";
+import type { Case, Shipment } from "@/lib/types";
 import {
   computeActiveCasesCount,
   computeOnTimeDeliveryRate,
   computeOnTimePickupRate
 } from "@/lib/metrics";
+import { useTenant } from "@/components/TenantProvider/TenantProvider";
 import styles from "@/styles/Page.module.css";
 
-export default async function ControlCenterPage() {
-  const [cases, shipments] = await Promise.all([getCases(), getShipments()]);
+export function ControlCenterView() {
+  const { tenantId, loadingTenant } = useTenant();
+  const [cases, setCases] = useState<Case[]>([]);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!tenantId) {
+        return;
+      }
+      setLoading(true);
+      const [casesResult, shipmentsResult] = await Promise.all([
+        listCases(tenantId),
+        listShipments(tenantId)
+      ]);
+      if (casesResult.error || shipmentsResult.error) {
+        setError(casesResult.error ?? shipmentsResult.error ?? "Unable to load data.");
+      } else {
+        setCases(casesResult.data ?? []);
+        setShipments(shipmentsResult.data ?? []);
+        setError(null);
+      }
+      setLoading(false);
+    };
+
+    load();
+  }, [tenantId]);
+
   const caseRows = cases.map((item) => ({
-    shipment: item.shipmentId,
+    shipment: item.shipmentId || "-",
     type: item.type,
     status: item.status,
     owner: item.owner,
-    sla: new Date(item.slaDue).toLocaleString()
+    sla: item.slaDue ? new Date(item.slaDue).toLocaleString() : "TBD"
   }));
   const onTimePickupRate = computeOnTimePickupRate(shipments, 7);
   const onTimeDeliveryRate = computeOnTimeDeliveryRate(shipments, 7);
   const activeCases = computeActiveCasesCount(cases);
+
+  if (loadingTenant) {
+    return (
+      <div className={styles.page}>
+        <SectionHeader
+          title="Operational Control Center"
+          subtitle="Run daily execution from a single operational truth across shipments, events, cases, and documents."
+          action="Create Manual Exception"
+        />
+        <p>Loading tenant...</p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -29,6 +75,8 @@ export default async function ControlCenterPage() {
         subtitle="Run daily execution from a single operational truth across shipments, events, cases, and documents."
         action="Create Manual Exception"
       />
+      {loading ? <p>Loading operational data...</p> : null}
+      {error ? <p className={styles.errorText}>{error}</p> : null}
 
       <div className={`${styles.grid} ${styles.gridThree}`}>
         <StatCard label="On-time Pickup" value={`${onTimePickupRate.toFixed(0)}%`} helper="Rolling 7 days" />
@@ -40,6 +88,7 @@ export default async function ControlCenterPage() {
         <div className={styles.panel}>
           <div className={styles.panelHeader}>Shipments in Execution</div>
           <div className={styles.list}>
+            {shipments.length === 0 && !loading ? <p>No shipments yet.</p> : null}
             {shipments.map((shipment) => (
               <div key={shipment.id}>
                 <strong>{shipment.reference}</strong>

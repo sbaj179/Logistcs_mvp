@@ -1,6 +1,10 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatCard } from "@/components/StatCard";
-import { getCases, getIdleSessions, getShipments } from "@/lib/data";
+import { listCases, listIdleSessions, listShipments } from "@/lib/data";
+import type { Case, IdleSession, Shipment } from "@/lib/types";
 import {
   computeDeliveryVarianceMinutes,
   computeExceptionRate,
@@ -10,14 +14,43 @@ import {
   computeOnTimePickupRate,
   formatDuration
 } from "@/lib/metrics";
+import { useTenant } from "@/components/TenantProvider/TenantProvider";
 import styles from "@/styles/Page.module.css";
 
-export default async function AnalyticsPage() {
-  const [cases, shipments, idleSessions] = await Promise.all([
-    getCases(),
-    getShipments(),
-    getIdleSessions()
-  ]);
+export default function AnalyticsPage() {
+  const { tenantId, loadingTenant } = useTenant();
+  const [cases, setCases] = useState<Case[]>([]);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
+  const [idleSessions, setIdleSessions] = useState<IdleSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!tenantId) {
+        return;
+      }
+      setLoading(true);
+      const [casesResult, shipmentsResult, idleResult] = await Promise.all([
+        listCases(tenantId),
+        listShipments(tenantId),
+        listIdleSessions(tenantId)
+      ]);
+
+      if (casesResult.error || shipmentsResult.error || idleResult.error) {
+        setError(casesResult.error ?? shipmentsResult.error ?? idleResult.error ?? "Unable to load analytics.");
+      } else {
+        setCases(casesResult.data ?? []);
+        setShipments(shipmentsResult.data ?? []);
+        setIdleSessions(idleResult.data ?? []);
+        setError(null);
+      }
+      setLoading(false);
+    };
+
+    load();
+  }, [tenantId]);
+
   const exceptionRate = computeExceptionRate(cases, shipments);
   const medianResolutionMinutes = computeMedianResolution(cases);
   const idleCost = computeIdleCost(idleSessions, 30);
@@ -37,11 +70,14 @@ export default async function AnalyticsPage() {
         subtitle="Descriptive visibility into on-time performance, exceptions, and idle costs."
         action="Export Report"
       />
+      {loadingTenant ? <p>Loading tenant...</p> : null}
+      {loading && !loadingTenant ? <p>Loading analytics...</p> : null}
+      {error ? <p className={styles.errorText}>{error}</p> : null}
 
       <div className={`${styles.grid} ${styles.gridThree}`}>
         <StatCard label="Exception Rate" value={exceptionRate.toFixed(1)} helper="Per 100 shipments" />
         <StatCard label="Median Resolution" value={formatDuration(medianResolutionMinutes)} helper="Exceptions closed" />
-        <StatCard label="Idle Cost" value={`$${idleCost.toFixed(0)}`} helper="Trailing 30 days" />
+        <StatCard label="Idle Cost" value={`ZAR ${idleCost.toFixed(0)}`} helper="Trailing 30 days" />
       </div>
 
       <div className={`${styles.grid} ${styles.gridTwo}`}>
