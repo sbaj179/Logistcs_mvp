@@ -1,7 +1,7 @@
 \"use client\";
 
 import Link from \"next/link\";
-import { supabaseBrowser } from \"@/lib/supabase/browser\";
+import { supabaseClient } from \"@/lib/supabaseClient\";
 import styles from \"@/styles/AppNav.module.css\";
 
 const NAV_ITEMS = [
@@ -18,7 +18,7 @@ const NAV_ITEMS = [
 
 export function AppNav() {
   const handleSignOut = async () => {
-    const supabase = supabaseBrowser();
+    const supabase = supabaseClient;
     await supabase.auth.signOut();
     window.location.assign(\"/login\");
   };

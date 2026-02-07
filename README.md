@@ -19,6 +19,7 @@ npm run dev
 2. Create `.env.local` with:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_DEMO_TENANT_ID`
 
 The app resolves the tenant from `tenant_users` after a verified email login. Demo-only RLS policies are permissive; tighten them for production.
 
