@@ -1,4 +1,4 @@
-import { supabaseBrowser } from "@/lib/supabase/browser";
+import { DEMO_TENANT_ID, supabaseClient } from "@/lib/supabaseClient";
 import type {
   AuditLogEntry,
   Case,
@@ -12,6 +12,7 @@ import type {
 } from "@/lib/types";
 
 const DEFAULT_FUEL_PRICE = 25.5;
+export const DEFAULT_TENANT_ID = DEMO_TENANT_ID;
 
 type DataResult<T> = { data: T | null; error: string | null };
 
@@ -256,7 +257,7 @@ function mapAuditLog(row: DbAuditLog): AuditLogEntry {
 }
 
 export async function listShipments(tenantId: string): Promise<DataResult<Shipment[]>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("shipments")
     .select("*")
     .eq("tenant_id", tenantId)
@@ -280,7 +281,7 @@ export async function createShipment(
     planned_delivery_at?: string;
   }
 ): Promise<DataResult<DbShipment>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("shipments")
     .insert({
       tenant_id: tenantId,
@@ -298,7 +299,7 @@ export async function createShipment(
 }
 
 export async function getShipmentById(tenantId: string, id: string): Promise<DataResult<Shipment>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("shipments")
     .select("*")
     .eq("tenant_id", tenantId)
@@ -313,7 +314,7 @@ export async function getShipmentById(tenantId: string, id: string): Promise<Dat
 }
 
 export async function listEventsForShipment(tenantId: string, shipmentId: string): Promise<DataResult<Event[]>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("events")
     .select("*")
     .eq("tenant_id", tenantId)
@@ -338,7 +339,7 @@ export async function addShipmentEvent(
     source?: Event["source"];
   }
 ): Promise<DataResult<DbEvent>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("events")
     .insert({
       tenant_id: tenantId,
@@ -356,7 +357,7 @@ export async function addShipmentEvent(
 }
 
 export async function listCases(tenantId: string): Promise<DataResult<Case[]>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("cases")
     .select("*")
     .eq("tenant_id", tenantId)
@@ -382,7 +383,7 @@ export async function createCase(
     description?: string;
   }
 ): Promise<DataResult<DbCase>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("cases")
     .insert({
       tenant_id: tenantId,
@@ -408,7 +409,7 @@ export async function updateCaseStatus(
   caseId: string,
   status: Case["status"]
 ): Promise<DataResult<DbCase>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("cases")
     .update({ status })
     .eq("tenant_id", tenantId)
@@ -424,7 +425,7 @@ export async function closeCase(
   caseId: string,
   closure_reason: string
 ): Promise<DataResult<DbCase>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("cases")
     .update({ status: "Closed", closure_reason })
     .eq("tenant_id", tenantId)
@@ -440,7 +441,7 @@ export async function addCaseNote(
   caseId: string,
   note: string
 ): Promise<DataResult<{ id: string }>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("case_notes")
     .insert({
       tenant_id: tenantId,
@@ -454,7 +455,7 @@ export async function addCaseNote(
 }
 
 export async function listVehicles(tenantId: string): Promise<DataResult<DbVehicle[]>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("vehicles")
     .select("*")
     .eq("tenant_id", tenantId)
@@ -470,7 +471,7 @@ export async function createVehicle(
     idle_burn_lph: number;
   }
 ): Promise<DataResult<DbVehicle>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("vehicles")
     .insert({
       tenant_id: tenantId,
@@ -484,7 +485,7 @@ export async function createVehicle(
 }
 
 export async function listIdleSessions(tenantId: string): Promise<DataResult<IdleSession[]>> {
-  const client = supabaseBrowser();
+  const client = supabaseClient;
   const [{ data: idleRows, error: idleError }, { data: vehicleRows, error: vehicleError }] = await Promise.all([
     client
       .from("idle_sessions")
@@ -512,7 +513,7 @@ export async function createIdleSession(
     notes?: string;
   }
 ): Promise<DataResult<DbIdleSession>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("idle_sessions")
     .insert({
       tenant_id: tenantId,
@@ -529,7 +530,7 @@ export async function createIdleSession(
 }
 
 export async function listDocuments(tenantId: string): Promise<DataResult<Document[]>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("documents")
     .select("*")
     .eq("tenant_id", tenantId)
@@ -552,7 +553,7 @@ export async function createDocument(
     case_id?: string;
   }
 ): Promise<DataResult<DbDocument>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("documents")
     .insert({
       tenant_id: tenantId,
@@ -569,7 +570,7 @@ export async function createDocument(
 }
 
 export async function listIntegrationHealth(tenantId: string): Promise<DataResult<IntegrationHealth[]>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("integration_health")
     .select("*")
     .eq("tenant_id", tenantId)
@@ -583,7 +584,7 @@ export async function listIntegrationHealth(tenantId: string): Promise<DataResul
 }
 
 export async function listRoleDefinitions(tenantId: string): Promise<DataResult<RoleDefinition[]>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("role_definitions")
     .select("*")
     .eq("tenant_id", tenantId)
@@ -597,7 +598,7 @@ export async function listRoleDefinitions(tenantId: string): Promise<DataResult<
 }
 
 export async function listHandoverTemplates(tenantId: string): Promise<DataResult<HandoverTemplate[]>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("handover_templates")
     .select("*")
     .eq("tenant_id", tenantId)
@@ -611,7 +612,7 @@ export async function listHandoverTemplates(tenantId: string): Promise<DataResul
 }
 
 export async function listAuditLogs(tenantId: string): Promise<DataResult<AuditLogEntry[]>> {
-  const { data, error } = await supabaseBrowser()
+  const { data, error } = await supabaseClient
     .from("audit_logs")
     .select("*")
     .eq("tenant_id", tenantId)

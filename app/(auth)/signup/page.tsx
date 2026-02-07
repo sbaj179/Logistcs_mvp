@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { supabaseBrowser } from "@/lib/supabase/browser";
+import { supabaseClient } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -29,7 +29,7 @@ export default function SignupPage() {
     }
 
     setLoading(true);
-    const supabase = supabaseBrowser();
+    const supabase = supabaseClient;
     const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
@@ -54,7 +54,7 @@ export default function SignupPage() {
       setError("Enter your email to resend verification.");
       return;
     }
-    const supabase = supabaseBrowser();
+    const supabase = supabaseClient;
     const { error: resendError } = await supabase.auth.resend({ type: "signup", email });
     if (resendError) {
       setError(resendError.message);

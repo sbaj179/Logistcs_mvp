@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { supabaseBrowser } from "@/lib/supabase/browser";
+import { supabaseClient } from "@/lib/supabaseClient";
 import { fetchTenantIdForUser } from "@/lib/tenant";
 import styles from "@/styles/TenantProvider.module.css";
 
@@ -21,7 +21,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
   const loadTenant = useCallback(async () => {
     setLoadingTenant(true);
-    const supabase = supabaseBrowser();
+    const supabase = supabaseClient;
     const { data, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError || !data.session?.user) {
@@ -58,7 +58,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   }, [loadTenant]);
 
   const signOut = useCallback(async () => {
-    const supabase = supabaseBrowser();
+    const supabase = supabaseClient;
     await supabase.auth.signOut();
     window.location.assign("/login");
   }, []);
