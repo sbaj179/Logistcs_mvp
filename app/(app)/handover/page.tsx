@@ -1,10 +1,39 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
-import { getHandoverTemplates } from "@/lib/data";
+import { listHandoverTemplates } from "@/lib/data";
+import type { HandoverTemplate } from "@/lib/types";
+import { useTenant } from "@/components/TenantProvider/TenantProvider";
 import styles from "@/styles/Page.module.css";
 
-export default async function HandoverPage() {
-  const handoverTemplates = await getHandoverTemplates();
+export default function HandoverPage() {
+  const { tenantId, loadingTenant } = useTenant();
+  const [handoverTemplates, setHandoverTemplates] = useState<HandoverTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!tenantId) {
+        return;
+      }
+      setLoading(true);
+      const result = await listHandoverTemplates(tenantId);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setHandoverTemplates(result.data ?? []);
+        setError(null);
+      }
+      setLoading(false);
+    };
+
+    load();
+  }, [tenantId]);
+
   const template = handoverTemplates[0];
+
   return (
     <div className={styles.page}>
       <SectionHeader
@@ -12,6 +41,9 @@ export default async function HandoverPage() {
         subtitle="Digitize handovers with required checklists, documents, and explicit completion states."
         action="Start Handover"
       />
+      {loadingTenant ? <p>Loading tenant...</p> : null}
+      {loading && !loadingTenant ? <p>Loading handover templates...</p> : null}
+      {error ? <p className={styles.errorText}>{error}</p> : null}
 
       <div className={`${styles.grid} ${styles.gridTwo}`}>
         <div className={styles.panel}>
@@ -32,7 +64,7 @@ export default async function HandoverPage() {
             <div className={styles.field}>
               <label>Seal Intact</label>
               <select>
-                <option>{template?.sealIntact ?? "Yes"}</option>
+                <option>{template?.sealIntact || "Yes"}</option>
                 <option>{template?.sealIntact === "Yes" ? "No" : "Yes"}</option>
               </select>
             </div>

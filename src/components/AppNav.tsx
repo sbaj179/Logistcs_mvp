@@ -1,8 +1,11 @@
-import Link from "next/link";
-import styles from "@/styles/AppNav.module.css";
+\"use client\";
+
+import Link from \"next/link\";
+import { supabaseBrowser } from \"@/lib/supabase/browser\";
+import styles from \"@/styles/AppNav.module.css\";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Control Center" },
+  { href: "/dashboard", label: "Control Center" },
   { href: "/shipments", label: "Shipments" },
   { href: "/cases", label: "Cases" },
   { href: "/documents", label: "Documents" },
@@ -14,6 +17,12 @@ const NAV_ITEMS = [
 ];
 
 export function AppNav() {
+  const handleSignOut = async () => {
+    const supabase = supabaseBrowser();
+    await supabase.auth.signOut();
+    window.location.assign(\"/login\");
+  };
+
   return (
     <aside className={styles.nav}>
       <div className={styles.brand}>
@@ -30,6 +39,7 @@ export function AppNav() {
       <div className={styles.footer}>
         <p>Tenant: Roadline Logistics</p>
         <p>Role: Operations</p>
+        <button className={styles.signOut} onClick={handleSignOut}>Sign Out</button>
       </div>
     </aside>
   );

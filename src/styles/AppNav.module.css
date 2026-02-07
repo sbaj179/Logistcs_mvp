@@ -45,4 +45,17 @@
   font-size: 12px;
   color: #94a3b8;
   line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.signOut {
+  background: rgba(148, 163, 184, 0.2);
+  border: none;
+  color: #e2e8f0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  text-align: left;
 }

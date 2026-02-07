@@ -96,3 +96,8 @@
   font-weight: 600;
   color: #0f172a;
 }
+
+.errorText {
+  color: #b91c1c;
+  font-weight: 600;
+}
